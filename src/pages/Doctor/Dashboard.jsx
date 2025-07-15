@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import Navbar from "../../components/Navbar";
-import { Send } from "lucide-react";
+import { Send, Eye } from "lucide-react";
 
 export default function DoctorDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,6 +22,7 @@ export default function DoctorDashboard() {
   const [purpose, setPurpose] = useState("");
   const [timelineMinutes, setTimelineMinutes] = useState("");
   const [consentSent, setConsentSent] = useState(false);
+  const [approvedConsents, setApprovedConsents] = useState([]);
 
   useEffect(() => {
     const fetchDoctorData = async () => {
@@ -43,6 +44,27 @@ export default function DoctorDashboard() {
 
     fetchDoctorData();
   }, []);
+
+  const checkApprovedConsents = async (patientId) => {
+    if (!doctorData) return [];
+
+    try {
+      const consentQuery = query(
+        collection(db, "patients", patientId, "consentRequests"),
+        where("doctorId", "==", doctorData.uid),
+        where("status", "==", "approved")
+      );
+      
+      const consentSnap = await getDocs(consentQuery);
+      return consentSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (err) {
+      console.error("Error checking approved consents:", err);
+      return [];
+    }
+  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -86,31 +108,38 @@ export default function DoctorDashboard() {
     if (patient) {
       const data = patient.data();
 
-      // TEMP: attach mock reports
+      // Fetch healthRecords from Firestore
+      let healthRecords = [];
+      try {
+        const healthRecordsSnap = await getDocs(
+          collection(db, "patients", patient.id, "healthRecords")
+        );
+
+        healthRecords = healthRecordsSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } catch (err) {
+        console.error("Error fetching health records:", err);
+      }
+
+      // Check for approved consents
+      const approvedConsentsList = await checkApprovedConsents(patient.id);
+      setApprovedConsents(approvedConsentsList);
+
       setSelectedPatient({
         id: patient.id,
         ...data,
-        reports: [
-          {
-            name: "Diabetes.pdf",
-            date: "2025-06-28",
-            type: "Lab Report",
-            size: "2.3 MB",
-          },
-          {
-            name: "Blood_Test.pdf",
-            date: "2025-06-20",
-            type: "Lab Report",
-            size: "1.8 MB",
-          },
-        ],
+        reports: healthRecords,
       });
+
       setConsentSent(false);
       setPurpose("");
       setTimelineMinutes("");
     } else {
       setSelectedPatient(null);
       setConsentSent(false);
+      setApprovedConsents([]);
     }
   };
 
@@ -149,9 +178,19 @@ export default function DoctorDashboard() {
     }
   };
 
+  const handleViewFile = (url) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
+  const hasApprovedConsent = () => {
+    return approvedConsents.length > 0;
+  };
+
   return (
     <div className="min-h-screen mt-10 bg-gradient-to-br from-slate-50 to-teal-50">
-      <Navbar userType="doctor"/>
+      <Navbar userType="doctor" />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Search Card */}
@@ -220,7 +259,9 @@ export default function DoctorDashboard() {
                 <div>
                   <span className="text-gray-500 text-sm">Joined At:</span>
                   <p>
-                    {new Date(selectedPatient.createdAt).toLocaleDateString()}
+                    {selectedPatient.createdAt
+                      ? new Date(selectedPatient.createdAt).toLocaleDateString()
+                      : "-"}
                   </p>
                 </div>
               </div>
@@ -230,56 +271,80 @@ export default function DoctorDashboard() {
             <div className="lg:col-span-2 bg-white border border-teal-200 rounded-lg p-6">
               <h3 className="text-teal-800 text-lg font-semibold mb-4">
                 Medical Reports ({selectedPatient.reports.length})
+                {hasApprovedConsent() && (
+                  <span className="ml-2 text-sm text-green-600 bg-green-100 px-2 py-1 rounded">
+                    ✅ Consent Approved
+                  </span>
+                )}
               </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm text-left">
-                  <thead>
-                    <tr className="border-b border-teal-100">
-                      <th className="py-3 px-4 font-medium text-gray-700">
-                        File Name
-                      </th>
-                      <th className="py-3 px-4 font-medium text-gray-700">
-                        Type
-                      </th>
-                      <th className="py-3 px-4 font-medium text-gray-700">
-                        Date Uploaded
-                      </th>
-                      <th className="py-3 px-4 font-medium text-gray-700">
-                        Size
-                      </th>
-                      <th className="py-3 px-4 font-medium text-gray-700">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedPatient.reports.map((report, index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-gray-100 hover:bg-teal-50"
-                      >
-                        <td className="py-3 px-4">{report.name}</td>
-                        <td className="py-3 px-4">{report.type}</td>
-                        <td className="py-3 px-4">{report.date}</td>
-                        <td className="py-3 px-4">{report.size}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex gap-2">
-                            <button className="text-teal-700 border border-teal-200 px-2 py-1 rounded hover:bg-teal-50">
-                              Request Consent
-                            </button>
-                            {/* <button className="text-blue-700 border border-blue-200 px-2 py-1 rounded hover:bg-blue-50">
-                              Download
-                            </button> */}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
 
-              {/* Consent Request Form */}
-              {doctorData && (
+              {selectedPatient.reports.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm text-left">
+                    <thead>
+                      <tr className="border-b border-teal-100">
+                        <th className="py-3 px-4 font-medium text-gray-700">
+                          File Name
+                        </th>
+                        <th className="py-3 px-4 font-medium text-gray-700">
+                          Type
+                        </th>
+                        <th className="py-3 px-4 font-medium text-gray-700">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedPatient.reports.map((report, index) => (
+                        <tr
+                          key={index}
+                          className="border-b border-gray-100 hover:bg-teal-50"
+                        >
+                          <td className="py-3 px-4">
+                            {report.name || "-"}
+                          </td>
+                          <td className="py-3 px-4">
+                            {report.type || "-"}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-2">
+                              {hasApprovedConsent() ? (
+                                <button
+                                  onClick={() => handleViewFile(report.url)}
+                                  className="flex items-center gap-1 text-green-700 border border-green-200 px-3 py-1 rounded hover:bg-green-50"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                  View
+                                </button>
+                              ) : (
+                                <button className="text-teal-700 border border-teal-200 px-2 py-1 rounded hover:bg-teal-50">
+                                  Request Consent
+                                </button>
+                              )}
+                              {report.url && hasApprovedConsent() && (
+                                <a
+                                  href={report.url}
+                                  download
+                                  className="text-blue-700 border border-blue-200 px-2 py-1 rounded hover:bg-blue-50"
+                                >
+                                  Download
+                                </a>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-gray-600">
+                  No health records found for this patient.
+                </p>
+              )}
+
+              {/* Consent Request Form - Only show if no approved consent */}
+              {doctorData && !hasApprovedConsent() && (
                 <div className="mt-8 border-t pt-6">
                   <h3 className="text-lg font-bold text-teal-700 mb-4">
                     Request Consent from {selectedPatient.fullName}
@@ -325,6 +390,27 @@ export default function DoctorDashboard() {
                       <p className="text-green-600 mt-2 font-medium text-sm">
                         ✅ Consent request sent successfully!
                       </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Show approved consent info */}
+              {hasApprovedConsent() && (
+                <div className="mt-8 border-t pt-6">
+                  <h3 className="text-lg font-bold text-green-700 mb-4">
+                    Consent Approved ✅
+                  </h3>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-sm text-green-800">
+                      You have approved access to view and download this patient's medical records.
+                    </p>
+                    {approvedConsents.length > 0 && (
+                      <div className="mt-2 text-xs text-green-700">
+                        <p><strong>Purpose:</strong> {approvedConsents[0].purpose}</p>
+                        <p><strong>Timeline:</strong> {approvedConsents[0].timelineMinutes} minutes</p>
+                        <p><strong>Approved:</strong> {approvedConsents[0].timestamp ? new Date(approvedConsents[0].timestamp.seconds * 1000).toLocaleString() : 'Recently'}</p>
+                      </div>
                     )}
                   </div>
                 </div>
