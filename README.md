@@ -1,1 +1,0 @@
-# MedXact_Hack4Health
