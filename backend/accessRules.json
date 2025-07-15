@@ -1,0 +1,6 @@
+{
+  "Cardiology": ["ECG results", "Echocardiograms", "Heart medication history"],
+  "Neurology": ["Brain MRI scans", "Neuro assessment reports", "Seizure history"],
+  "Pediatrics": ["Vaccination records", "Growth charts", "Childhood illness history"],
+  "Mental Health": ["Depression test", "Depression medications", "Psychiatric evaluations", "Therapy session notes"]
+}
