@@ -61,7 +61,7 @@ const getStatusIcon = (type) => {
 };
 
 const PatientDashboard = () => {
-  const [patientName, setPatientName] = useState("Patient");
+  // const [patientName, setPatientName] = useState("Patient");
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [viewingFile, setViewingFile] = useState(null);
   const [consentRequests, setConsentRequests] = useState([]);
@@ -393,18 +393,18 @@ const PatientDashboard = () => {
       setUploadStatus({ type: "info", message: "Storing on blockchain..." });
 
       // Store on blockchain
-      try {
-        const contract = await getContract();
-        const patientId = auth.currentUser?.uid || "PATIENT-123";
+      // try {
+      //   const contract = await getContract();
+      //   const patientId = auth.currentUser?.uid || "PATIENT-123";
 
-        const tx = await contract.storeDocumentHash(patientId, hashBytes32);
-        await tx.wait();
+      //   const tx = await contract.storeDocumentHash(patientId, hashBytes32);
+      //   await tx.wait();
 
-        setUploadStatus({ type: "success", message: "Document hash stored on blockchain!" });
-      } catch (err) {
-        console.error("Blockchain storage failed:", err);
-        setUploadStatus({ type: "warning", message: "Blockchain storage failed, saving locally..." });
-      }
+      //   setUploadStatus({ type: "success", message: "Document hash stored on blockchain!" });
+      // } catch (err) {
+      //   console.error("Blockchain storage failed:", err);
+      //   setUploadStatus({ type: "warning", message: "Blockchain storage failed, saving locally..." });
+      // }
 
       // Create file object
       const newFile = {
