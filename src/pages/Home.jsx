@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import WalletConnect from "../components/WalletConnect";
 
 export default function Home() {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -33,44 +32,42 @@ export default function Home() {
     setShowLoginForm(false);
   };
 
-const handleLogin = async () => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      loginEmail,
-      loginPassword
-    );
-    const user = userCredential.user;
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        loginEmail,
+        loginPassword
+      );
+      const user = userCredential.user;
 
-    const doctorRef = doc(db, "doctors", user.uid);
-    const patientRef = doc(db, "patients", user.uid);
+      const doctorRef = doc(db, "doctors", user.uid);
+      const patientRef = doc(db, "patients", user.uid);
 
-    const [doctorSnap, patientSnap] = await Promise.all([
-      getDoc(doctorRef),
-      getDoc(patientRef),
-    ]);
+      const [doctorSnap, patientSnap] = await Promise.all([
+        getDoc(doctorRef),
+        getDoc(patientRef),
+      ]);
 
-    if (doctorSnap.exists()) {
-      const doctorData = doctorSnap.data();
-      const isOnboarded = !!doctorData.specialization;
-      navigate(isOnboarded ? "/doctor/profile" : "/doctor/onboarding");
-      return;
+      if (doctorSnap.exists()) {
+        const doctorData = doctorSnap.data();
+        const isOnboarded = !!doctorData.specialization;
+        navigate(isOnboarded ? "/doctor/profile" : "/doctor/onboarding");
+        return;
+      }
+
+      if (patientSnap.exists()) {
+        const patientData = patientSnap.data();
+        const isOnboarded = !!patientData.age;
+        navigate(isOnboarded ? "/patient/profile" : "/onboarding");
+        return;
+      }
+
+      alert("User role not found in database.");
+    } catch (error) {
+      alert("Login failed: " + error.message);
     }
-
-    if (patientSnap.exists()) {
-      const patientData = patientSnap.data();
-      const isOnboarded = !!patientData.age;
-      navigate(isOnboarded ? "/patient/profile" : "/onboarding");
-      return;
-    }
-
-    alert("User role not found in database.");
-  } catch (error) {
-    alert("Login failed: " + error.message);
-  }
-};
-
-
+  };
 
   const handleSignup = async () => {
     if (signupPassword !== confirmPassword) {
@@ -207,16 +204,6 @@ const handleLogin = async () => {
             </div>
           )}
 
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 border-t border-gray-300"></div>
-            <span className="px-4 text-sm text-gray-500">or</span>
-            <div className="flex-1 border-t border-gray-300"></div>
-          </div>
-
-          {/* WalletConnect */}
-          <WalletConnect />
-
           {/* Benefits */}
           <div className="mt-8 p-4 rounded-lg" style={{ background: "linear-gradient(to right, #f0fdfa, #ecfeff)" }}>
             <h3 className="font-semibold text-gray-800 mb-2">{userType === "patient" ? "Patient Benefits:" : "Healthcare Provider Benefits:"}</h3>
@@ -248,4 +235,3 @@ const handleLogin = async () => {
     </div>
   );
 }
-

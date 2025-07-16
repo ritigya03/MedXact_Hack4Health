@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 // Patient pages
 import Home from "./pages/Home";
@@ -22,9 +22,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Home & Landing */}
-        <Route path="/" element={<Home />} />
+        {/* Redirect root path to landing page */}
+        <Route path="/" element={<Navigate to="/landing-page" replace />} />
+        
+        {/* Landing Page */}
         <Route path="/landing-page" element={<MedxactLanding />} />
+        
+        {/* Home Page (now accessible via /home) */}
+        <Route path="/home" element={<Home />} />
 
         {/* Patient Routes */}
         <Route path="/patient/dashboard" element={<PatientDashboard />} />

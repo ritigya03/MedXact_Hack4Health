@@ -6,7 +6,6 @@ import { auth, db } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
-
 import {
   User,
   Copy,
@@ -17,11 +16,9 @@ import {
   Activity,
   Pill,
   Phone,
-  QrCode,
   Pencil,
   Save,
 } from "lucide-react";
-import QRCode from "react-qr-code";
 import Navbar from "../../components/Navbar";
 
 const generateUniqueId = () =>
@@ -34,21 +31,18 @@ const PatientProfile = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
-  const [showQR, setShowQR] = useState(false);
   const [showID, setShowID] = useState(false);
 
   const navigate = useNavigate();
 
-
- const handleLogout = async () => {
-  try {
-    await signOut(auth);
-    navigate("/"); // This will redirect to Home.jsx
-  } catch (error) {
-    console.error("Logout failed:", error.message);
-  }
-};
-
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error.message);
+    }
+  };
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -116,14 +110,8 @@ const PatientProfile = () => {
     );
   }
 
-  const qrData = JSON.stringify({
-    name: patientData.fullName,
-    healthId: patientData.healthId,
-    emergencyContact: patientData.emergencyContact,
-  });
-
   return (
-    <div className="min-h-screen mt-10 ">
+    <div className="min-h-screen mt-10">
       <Navbar userType="patient" />
 
       <div className="max-w-screen mx-auto px-20 py-10">
@@ -145,7 +133,6 @@ const PatientProfile = () => {
             )}
           </button>
 
-          {/* 🚪 Logout */}
           <button
             onClick={handleLogout}
             className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
@@ -155,7 +142,6 @@ const PatientProfile = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Section */}
           <div className="lg:col-span-2 space-y-10">
             <div className={cardClass}>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
@@ -265,50 +251,19 @@ const PatientProfile = () => {
             </div>
           </div>
 
-          {/* Right Section */}
           <div>
             <div className={cardClass}>
               <h3 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
-                <QrCode className="w-5 h-5 mr-2 text-blue-500" />
-                Emergency QR & ID
+                Emergency ID
               </h3>
 
-              <div className="space-y-4">
-                <button
-                  onClick={() => setShowQR(prev => !prev)}
-                  className="w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-teal-600 transition-all transform hover:scale-105 flex items-center justify-center space-x-3"
-                >
-                  <QrCode className="h-5 w-5" />
-                  <span>{showQR ? "Hide QR" : "Show QR"}</span>
-                </button>
-                <button
-                  onClick={() => setShowID(prev => !prev)}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 flex items-center justify-center space-x-3"
-                >
-                  <User className="h-5 w-5" />
-                  <span>{showID ? "Hide ID" : "Show ID"}</span>
-                </button>
-              </div>
-
-              {showQR && (
-                <div className="mt-6 text-center">
-                  <div className="bg-gray-100 p-6 rounded-xl border-2 border-dashed border-gray-300">
-                    <QRCode
-                      value={qrData}
-                      size={180}
-                      style={{
-                        height: "auto",
-                        maxWidth: "100%",
-                        width: "100%",
-                      }}
-                      className="rounded-md"
-                    />
-                    <p className="text-gray-600 text-sm mt-4">
-                      QR Code for emergency profile access
-                    </p>
-                  </div>
-                </div>
-              )}
+              <button
+                onClick={() => setShowID(prev => !prev)}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 flex items-center justify-center space-x-3"
+              >
+                <User className="h-5 w-5" />
+                <span>{showID ? "Hide ID" : "Show ID"}</span>
+              </button>
 
               {showID && (
                 <div className="mt-6 text-center text-sm text-gray-800">
