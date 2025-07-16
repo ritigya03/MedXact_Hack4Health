@@ -1,23 +1,20 @@
-"use client";
-
 import { useState } from "react";
-import {
-  Menu,
-  X,
-} from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar({ userType = "patient" }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useTranslation();
 
   const links = [
-    { label: "Dashboard", path: "dashboard" },
-    { label: "Profile", path: "profile" },
-    { label: "Settings", path: "settings" },
-    { label: "Contact", path: "contact" },
+    { label: t("dashboard") || "Dashboard", path: "dashboard" },
+    { label: t("profile") || "Profile", path: "profile" },
+    { label: t("settings") || "Settings", path: "settings" },
+    { label: t("contact") || "Contact", path: "contact" },
   ];
 
-  // compute the correct prefix
   const basePath = userType === "patient" ? "/patient" : "/doctor";
 
   return (
@@ -30,7 +27,7 @@ export default function Navbar({ userType = "patient" }) {
       >
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-            MEDXACT
+            {t("medxact") || "MEDXACT"}
           </h2>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -73,7 +70,7 @@ export default function Navbar({ userType = "patient" }) {
                 <Menu className="h-5 w-5" />
               </button>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-                MEDXACT
+                {t("medxact") || "MEDXACT"}
               </h1>
               <div className="hidden lg:flex space-x-8 ml-12">
                 {links.map((link, index) => (
@@ -87,10 +84,12 @@ export default function Navbar({ userType = "patient" }) {
                 ))}
               </div>
             </div>
-            <button className="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300">
-              <span>AI</span>
-              {/* <ArrowRight className="h-4 w-4" /> */}
-            </button>
+            <div className="flex mt-10 items-center space-x-4">
+        
+
+              {/* Add Language Switcher here */}
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </nav>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Upload, FileText, Eye, Trash2, Heart, Shield,
-   X, Image as ImageIcon, AlertCircle, CheckCircle, Clock, Brain, Zap, BarChart3, EyeOff,FileStack, TrendingUp, RefreshCw, AlertTriangle, TrendingDown, Minus, Info,HeartPulse,
-     Layers,
-     Sparkles,
+   X, Image as ImageIcon, AlertCircle, CheckCircle, Clock, Brain, Zap, BarChart3, FileStack, TrendingUp,HeartPulse,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -21,17 +21,13 @@ import {
   setDoc, getDocs 
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+// Import blockchain utilities
 import { getContract } from "../../utils/medxactContract";
 import { ethers } from "ethers";
 import { nanoid } from "nanoid";
-import { Chart, registerables } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 
 // Setup PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
-
-// Initialize Chart.js
-Chart.register(...registerables);
 
 const hashFile = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
@@ -67,9 +63,7 @@ const getStatusIcon = (type) => {
 };
 
 const PatientDashboard = () => {
-  // Add this state variable at the top of your component with other state declarations
-const [showCharts, setShowCharts] = useState(false);
- // const [patientName, setPatientName] = useState("Patient");
+  // const [patientName, setPatientName] = useState("Patient");
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [viewingFile, setViewingFile] = useState(null);
   const [consentRequests, setConsentRequests] = useState([]);
@@ -77,8 +71,7 @@ const [showCharts, setShowCharts] = useState(false);
   const [personalDetails, setPersonalDetails] = useState({ 
     name: false, contact: false, location: false, family: false 
   });
-  const [charts, setCharts] = useState([]);
-  const [chartError, setChartError] = useState(null);
+
   const [uploadStatus, setUploadStatus] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(false);
   const [aiInsights, setAiInsights] = useState([]);
@@ -91,40 +84,6 @@ const [showCharts, setShowCharts] = useState(false);
   const [preventiveAdvice, setPreventiveAdvice] = useState([]);
   const [overallPreventiveAdvice, setOverallPreventiveAdvice] = useState("");
   const [adviceView, setAdviceView] = useState("overall");
-
-  const fetchVisualInsights = async () => {
-    if (!auth.currentUser || reportHistory.length === 0) return;
-    
-    try {
-      setChartError(null);
-      const response = await fetch('http://localhost:4000/api/visual-insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patientId: auth.currentUser.uid })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch visual insights: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (!result.lineCharts || !Array.isArray(result.lineCharts)) {
-        throw new Error("Invalid chart data received from server");
-      }
-      
-      setCharts(result.lineCharts);
-      
-      // Store radar chart data separately if needed
-      if (result.radarChart) {
-        // You might want to store this in state if you need to display it
-      }
-    } catch (error) {
-      console.error("Error fetching visual insights:", error);
-      setChartError(error.message);
-      setCharts([]);
-    }
-  };
 
   // PDF text extraction function
   const extractTextFromPDF = async (file) => {
@@ -155,123 +114,117 @@ const [showCharts, setShowCharts] = useState(false);
       return null;
     }
   };
-   //generate preventive insights
-    const generateOverallPreventiveAdvice = async () => {
-    try {
-      setGeneratingAdvice(true);
+
+  //generate preventive insights
+  const generateOverallPreventiveAdvice = async () => {
+  try {
+    setGeneratingAdvice(true);
+    setUploadStatus({
+      type: "info",
+      message: "Generating overall preventive advice...",
+    });
+
+    const res = await fetch("http://localhost:4000/api/preventive-advice", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: reportHistory.join("\n\n"), // combine all reports into one block
+      }),
+    });
+
+    const data = await res.json();
+    console.log("🌿 Overall Preventive Advice Response:", data);
+
+    if (typeof data?.preventiveAdvice === "string") {
+      setOverallPreventiveAdvice(data.preventiveAdvice);
+
       setUploadStatus({
-        type: "info",
-        message: "Generating overall preventive advice...",
+        type: "success",
+        message: "Overall preventive advice generated successfully!",
       });
-  
-      const res = await fetch("http://localhost:4000/api/preventive-advice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: reportHistory.join("\n\n"), // combine all reports into one block
-        }),
-      });
-  
-      const data = await res.json();
-      console.log("🌿 Overall Preventive Advice Response:", data);
-  
-      if (typeof data?.preventiveAdvice === "string") {
-        setOverallPreventiveAdvice(data.preventiveAdvice);
-  
-        setUploadStatus({
-          type: "success",
-          message: "Overall preventive advice generated successfully!",
-        });
-      } else {
-        setUploadStatus({
-          type: "warning",
-          message: "AI overall preventive advice could not be generated",
-        });
-      }
-    } catch (error) {
-      console.error("Error generating overall preventive advice:", error);
+    } else {
       setUploadStatus({
-        type: "error",
-        message: "Failed to generate overall preventive advice",
+        type: "warning",
+        message: "AI overall preventive advice could not be generated",
       });
-    } finally {
-      setGeneratingAdvice(false);
     }
-  };
-  
-  const generatePreventiveAdvice = async (text, fileName) => {
-    try {
-      setGeneratingAdvice(true);
+  } catch (error) {
+    console.error("Error generating overall preventive advice:", error);
+    setUploadStatus({
+      type: "error",
+      message: "Failed to generate overall preventive advice",
+    });
+  } finally {
+    setGeneratingAdvice(false);
+  }
+};
+
+const generatePreventiveAdvice = async (text, fileName) => {
+  try {
+    setGeneratingAdvice(true);
+    setUploadStatus({
+      type: "info",
+      message: "Generating AI preventive advice...",
+    });
+
+    const res = await fetch("http://localhost:4000/api/preventive-advice", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        reportHistory, // if you want to send previous reports
+      }),
+    });
+
+    const data = await res.json();
+    console.log("🌿 Preventive Advice Response:", data);
+
+    if (typeof data?.preventiveAdvice === "string") {
+      const adviceSections = data.preventiveAdvice
+        .split(/\n+/)
+        .filter(Boolean);
+      const timestamp = new Date().toISOString();
+
+      const adviceObj = {
+        id: nanoid(),
+        fileName,
+        adviceSections,
+        timestamp,
+        text: text.substring(0, 200) + "...", // preview
+      };
+
+      setPreventiveAdvice((prev) => [adviceObj, ...prev]);
+
       setUploadStatus({
-        type: "info",
-        message: "Generating AI preventive advice...",
+        type: "success",
+        message: "Preventive advice generated successfully!",
       });
-  
-      const res = await fetch("http://localhost:4000/api/preventive-advice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text,
-          reportHistory, // if you want to send previous reports
-        }),
-      });
-  
-      const data = await res.json();
-      console.log("🌿 Preventive Advice Response:", data);
-  
-      if (typeof data?.preventiveAdvice === "string") {
-        const adviceSections = data.preventiveAdvice
-          .split(/\n+/)
-          .filter(Boolean);
-        const timestamp = new Date().toISOString();
-  
-        const adviceObj = {
-          id: nanoid(),
-          fileName,
-          adviceSections,
-          timestamp,
-          text: text.substring(0, 200) + "...", // preview
-        };
-  
-        setPreventiveAdvice((prev) => [adviceObj, ...prev]);
-  
-        setUploadStatus({
-          type: "success",
-          message: "Preventive advice generated successfully!",
-        });
-      } else {
-        setUploadStatus({
-          type: "warning",
-          message: "AI preventive advice could not be generated",
-        });
-      }
-    } catch (error) {
-      console.error("Error generating preventive advice:", error);
+    } else {
       setUploadStatus({
-        type: "error",
-        message: "Failed to generate preventive advice",
+        type: "warning",
+        message: "AI preventive advice could not be generated",
       });
-    } finally {
-      setGeneratingAdvice(false);
     }
-  };
-  
+  } catch (error) {
+    console.error("Error generating preventive advice:", error);
+    setUploadStatus({
+      type: "error",
+      message: "Failed to generate preventive advice",
+    });
+  } finally {
+    setGeneratingAdvice(false);
+  }
+};
 
   // Generate AI insights function for individual files
   const generateInsights = async (text, fileName) => {
     try {
       setGeneratingInsights(true);
       setUploadStatus({ type: "info", message: "Generating AI insights..." });
-
-      console.log("🔍 Sending request to insights API:", {
-        textLength: text.length,
-        fileName,
-        textPreview: text.substring(0, 100) + "..."
-      });
 
       const res = await fetch("http://localhost:4000/api/insights", {
         method: "POST",
@@ -284,16 +237,6 @@ const [showCharts, setShowCharts] = useState(false);
         }),
       });
 
-      // Debug response
-      console.log("🔍 Response status:", res.status);
-      console.log("🔍 Response headers:", res.headers);
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("🔍 Error response:", errorText);
-        throw new Error(`API returned ${res.status}: ${errorText}`);
-      }
-
       const data = await res.json();
       console.log("🔍 AI Insights Response:", data);
 
@@ -301,26 +244,27 @@ const [showCharts, setShowCharts] = useState(false);
         const insights = data.summary.split(/\n+/).filter(Boolean);
         const timestamp = new Date().toISOString();
         
+        // Create insight object with metadata
         const insightObj = {
           id: nanoid(),
           fileName,
           insights,
           timestamp,
-          text: text.substring(0, 200) + "..."
+          text: text.substring(0, 200) + "..." // Store preview
         };
 
         setAiInsights(prevInsights => [insightObj, ...prevInsights]);
+        
+        // Add to report history for overall analysis
         setReportHistory(prev => [text, ...prev]);
+        
         setUploadStatus({ type: "success", message: "AI insights generated successfully!" });
       } else {
         setUploadStatus({ type: "warning", message: "AI insights could not be generated" });
       }
     } catch (error) {
-      console.error("🔍 Error generating AI insights:", error);
-      setUploadStatus({ 
-        type: "error", 
-        message: `Failed to generate AI insights: ${error.message}` 
-      });
+      console.error("Error generating AI insights:", error);
+      setUploadStatus({ type: "error", message: "Failed to generate AI insights" });
     } finally {
       setGeneratingInsights(false);
     }
@@ -445,7 +389,6 @@ const [showCharts, setShowCharts] = useState(false);
       hashStaticFiles();
     }
   }, [uploadedFiles.length]);
-  
   // Consent requests listener
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -524,7 +467,6 @@ const [showCharts, setShowCharts] = useState(false);
     });
     return () => unsubscribe();
   }, []);
-  
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -550,7 +492,7 @@ const [showCharts, setShowCharts] = useState(false);
 
       const fileURL = URL.createObjectURL(file);
       const hashHex = await hashFile(file);
-      // const hashBytes32 = ethers.zeroPadBytes("0x" + hashHex, 32);
+      const hashBytes32 = ethers.zeroPadBytes("0x" + hashHex, 32);
 
       // Extract text if PDF and generate AI insights
       let extractedText = null;
@@ -657,42 +599,40 @@ const [showCharts, setShowCharts] = useState(false);
       setUploadStatus({ type: "error", message: "Failed to delete file" });
     }
   };
-  
   const handleConsentResponse = async (id, decision) => {
-    try {
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const consentRef = doc(db, "patients", user.uid, "consentRequests", id);
-      
-      if (decision === "denied") {
-        await deleteDoc(consentRef);
-        setConsentRequests(prev => prev.filter(req => req.id !== id));
-      } else {
-        await updateDoc(consentRef, { 
-          status: decision,
-          respondedAt: new Date().toISOString()
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+  
+        const consentRef = doc(db, "patients", user.uid, "consentRequests", id);
+        
+        if (decision === "denied") {
+          await deleteDoc(consentRef);
+          setConsentRequests(prev => prev.filter(req => req.id !== id));
+        } else {
+          await updateDoc(consentRef, { 
+            status: decision,
+            respondedAt: new Date().toISOString()
+          });
+          setConsentRequests(prev => prev.map(req => 
+            req.id === id ? { ...req, status: decision } : req
+          ));
+        }
+  
+        setUploadStatus({ 
+          type: "success", 
+          message: `Consent request ${decision === "approved" ? "approved" : "denied"}` 
         });
-        setConsentRequests(prev => prev.map(req => 
-          req.id === id ? { ...req, status: decision } : req
-        ));
+  
+        setTimeout(() => {
+          setUploadStatus(null);
+        }, 3000);
+      } catch (error) {
+        console.error("Consent response error:", error);
+        setUploadStatus({ type: "error", message: "Failed to respond to consent request" });
       }
-
-      setUploadStatus({ 
-        type: "success", 
-        message: `Consent request ${decision === "approved" ? "approved" : "denied"}` 
-      });
-
-      setTimeout(() => {
-        setUploadStatus(null);
-      }, 3000);
-    } catch (error) {
-      console.error("Consent response error:", error);
-      setUploadStatus({ type: "error", message: "Failed to respond to consent request" });
-    }
-  };
-    
-  const togglePersonalDetail = (key) => {
+    };
+ const togglePersonalDetail = (key) => {
     setPersonalDetails(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -722,7 +662,7 @@ const [showCharts, setShowCharts] = useState(false);
       await generateInsights(file.extractedText, file.name);
     }
   };
-function highlightKeywords(text) {
+  function highlightKeywords(text) {
     const regex = /\b(high|low|critical|abnormal|\d+\.?\d*)\b/gi;
     return text.split(regex).map((part, index) => {
       if (regex.test(part)) {
@@ -865,343 +805,18 @@ function highlightKeywords(text) {
                 </div>
               )}
             </div>
-
-            {/* Health Trends Visualization */}
-<div className="bg-white rounded-xl shadow-sm p-6">
-  <div className="flex justify-between items-center mb-4">
-    <h2 className="text-xl font-semibold flex items-center">
-      <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-      Health Trends & Insights
-    </h2>
-
-    <div className="flex gap-2">
-      <button
-        onClick={() => setShowCharts(!showCharts)}
-        className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 flex items-center"
-      >
-        {showCharts ? (
-          <>
-            <EyeOff className="w-4 h-4 mr-1" />
-            Hide Trends
-          </>
-        ) : (
-          <>
-            <Eye className="w-4 h-4 mr-1" />
-            Show Trends
-          </>
-        )}
-      </button>
-
-      <button
-        onClick={fetchVisualInsights}
-        className="px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 flex items-center"
-      >
-        <RefreshCw className="w-4 h-4 mr-1" />
-        Update Charts
-      </button>
-    </div>
-  </div>
-
-  {chartError ? (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-      <div className="flex items-center text-red-700">
-        <AlertCircle className="w-5 h-5 mr-2" />
-        <span>Error loading charts: {chartError}</span>
-      </div>
-    </div>
-  ) : null}
-
-  {showCharts && (
-    <>
-      {charts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6">
-          {charts.map((chart, index) => {
-                    // Standard Indian normal ranges for common health metrics
-                    const INDIAN_NORMAL_RANGES = {
-                      "Hemoglobin": { normal: [12, 16], warning: [10, 12], critical: [0, 10], unit: "g/dL" },
-                      "BloodPressure": { normal: [90, 120], warning: [120, 140], critical: [140, 180], unit: "mmHg" },
-                      "Glucose": { normal: [70, 100], warning: [100, 126], critical: [126, 200], unit: "mg/dL" },
-                      "Cholesterol": { normal: [0, 200], warning: [200, 240], critical: [240, 300], unit: "mg/dL" },
-                      "HDL": { normal: [40, 60], warning: [35,                      40], critical: [0, 35], unit: "mg/dL" },
-                      "LDL": { normal: [0, 100], warning: [100, 130], critical: [130, 190], unit: "mg/dL" },
-                      "Triglycerides": { normal: [0, 150], warning: [150, 200], critical: [200, 500], unit: "mg/dL" },
-                      "Creatinine": { normal: [0.6, 1.2], warning: [1.2, 1.5], critical: [1.5, 2.0], unit: "mg/dL" }
-                    };
-
-                    // Get the appropriate ranges for this metric
-                    const metricRanges = INDIAN_NORMAL_RANGES[chart.metric] || {
-                      normal: [0, 100],
-                      warning: [100, 120],
-                      critical: [120, 150],
-                      unit: ''
-                    };
-
-                    // Use chart-specific thresholds if available, otherwise use standard Indian ranges
-                    const thresholds = chart.thresholds || metricRanges;
-
-                    // Find the most recent value with null checks
-                    const latestValue = chart.data?.datasets?.[0]?.data?.[chart.data.datasets[0].data.length - 1] || 0;
-                    const latestDate = chart.data?.labels?.[chart.data.labels.length - 1] || new Date().toISOString();
-                    
-                    // Determine status based on thresholds
-                    let status = 'normal';
-                    let statusColor = 'green';
-                    let statusMessage = 'Within normal range';
-                    
-                    if (latestValue < thresholds.normal[0] || latestValue > thresholds.normal[1]) {
-                      status = 'warning';
-                      statusColor = 'yellow';
-                      statusMessage = 'Slightly outside normal range';
-                    }
-                    if ((thresholds.warning && (latestValue < thresholds.warning[0] || latestValue > thresholds.warning[1])) ||
-                        (thresholds.critical && (latestValue < thresholds.critical[0] || latestValue > thresholds.critical[1]))) {
-                      status = 'critical';
-                      statusColor = 'red';
-                      statusMessage = 'Significantly outside normal range - Consult your doctor';
-                    }
-
-                     return (
-                      <div key={index} className="chart-card p-5 border rounded-lg bg-white shadow-sm">
-                        {/* Chart Header with Status */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-                          <div>
-                            <h3 className="font-semibold text-lg text-gray-800 capitalize">
-                              {chart.metric.replace(/([A-Z])/g, ' $1').trim()}
-                            </h3>
-                            <p className="text-sm text-gray-600">
-                              Trend over time based on your test results
-                            </p>
-                          </div>
-                          
-                          <div className={
-                            statusColor === 'green' ? 'flex items-center px-3 py-2 rounded-md bg-green-50 border border-green-200' :
-                            statusColor === 'yellow' ? 'flex items-center px-3 py-2 rounded-md bg-yellow-50 border border-yellow-200' :
-                            'flex items-center px-3 py-2 rounded-md bg-red-50 border border-red-200'
-                          }>
-                            <div className={
-                              statusColor === 'green' ? 'w-3 h-3 rounded-full bg-green-500 mr-2' :
-                              statusColor === 'yellow' ? 'w-3 h-3 rounded-full bg-yellow-500 mr-2' :
-                              'w-3 h-3 rounded-full bg-red-500 mr-2'
-                            }></div>
-                            <span className={
-                              statusColor === 'green' ? 'text-sm font-medium text-green-700' :
-                              statusColor === 'yellow' ? 'text-sm font-medium text-yellow-700' :
-                              'text-sm font-medium text-red-700'
-                            }>
-                              {statusMessage}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        {/* Current Value Summary */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <p className="text-sm text-blue-600 mb-1">Current Value</p>
-                            <p className="text-2xl font-bold text-blue-800">
-                              {latestValue} {thresholds.unit || ''}
-                            </p>
-                            <p className="text-xs text-blue-600">
-                              Last test: {new Date(latestDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          
-                          <div className="bg-green-50 p-3 rounded-lg">
-                            <p className="text-sm text-green-600 mb-1">Normal Range</p>
-                            <p className="text-lg font-semibold text-green-800">
-                              {thresholds.normal[0]} to {thresholds.normal[1]} {thresholds.unit || ''}
-                            </p>
-                            <p className="text-xs text-green-600">
-                              Healthy range for Indian adults
-                            </p>
-                          </div>
-                          
-                          <div className="bg-purple-50 p-3 rounded-lg">
-                            <p className="text-sm text-purple-600 mb-1">Trend Direction</p>
-                            <div className="flex items-center">
-                              {latestValue > chart.data.datasets[0].data[chart.data.datasets[0].data.length - 2] ? (
-                                <>
-                                  <TrendingUp className="w-5 h-5 text-red-500 mr-1" />
-                                  <span className="text-red-600 font-medium">Increasing</span>
-                                </>
-                              ) : latestValue < chart.data.datasets[0].data[chart.data.datasets[0].data.length - 2] ? (
-                                <>
-                                  <TrendingDown className="w-5 h-5 text-green-500 mr-1" />
-                                  <span className="text-green-600 font-medium">Decreasing</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Minus className="w-5 h-5 text-gray-500 mr-1" />
-                                  <span className="text-gray-600 font-medium">Stable</span>
-                                </>
-                              )}
-                            </div>
-                            <p className="text-xs text-purple-600 mt-1">
-                              Compared to previous test
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* The Actual Chart */}
-                        <div className="h-64 mb-4 relative">
-  <Line 
-    data={chart.data} 
-    options={{
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `${context.dataset.label}: ${context.parsed.y} ${thresholds.unit || ''}`;
-            },
-            afterLabel: function(context) {
-              const date = new Date(context.label);
-              return `Test date: ${date.toLocaleDateString()}`;
-            }
-          }
-        },
-        annotation: {
-          annotations: {
-            normalRange: {
-              type: 'box',
-              yMin: thresholds.normal[0],
-              yMax: thresholds.normal[1],
-              backgroundColor: 'rgba(0, 255, 0, 0.1)',
-              borderColor: 'rgba(0, 255, 0, 0.3)',
-              borderWidth: 1,
-            },
-            warningRange: thresholds.warning ? {
-              type: 'box',
-              yMin: thresholds.warning[0],
-              yMax: thresholds.warning[1],
-              backgroundColor: 'rgba(255, 255, 0, 0.1)',
-              borderColor: 'rgba(255, 255, 0, 0.3)',
-              borderWidth: 1,
-            } : {}
-          }
-        }
-      },
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Test Date',
-            color: '#6b7280',
-          },
-          ticks: {
-            callback: function(value) {
-              const date = new Date(this.getLabelForValue(value));
-              return date.toLocaleDateString('en-US', {
-                month: 'short',
-                year: 'numeric'
-              });
-            }
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: chart.metric + (thresholds.unit ? ` (${thresholds.unit})` : ''),
-            color: '#6b7280',
-          },
-          min: Math.min(...chart.data.datasets[0].data) - (Math.max(...chart.data.datasets[0].data) * 0.1),
-          max: Math.max(...chart.data.datasets[0].data) + (Math.max(...chart.data.datasets[0].data) * 0.1),
-        },
-      },
-    }} 
-  />
-</div>
-                        
-                        {/* Health Interpretation */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium text-gray-800 mb-2 flex items-center">
-                            <Info className="w-4 h-4 mr-1 text-blue-500" />
-                            What this means for you
-                          </h4>
-                          <p className="text-sm text-gray-700 mb-3">
-                            {chart.interpretation || `Your ${chart.metric.toLowerCase()} levels have changed over time. ${status === 'normal' ? 
-                              'Currently within healthy range.' : 
-                              status === 'warning' ? 
-                              'Mildly outside normal range - monitor closely.' : 
-                              'Significantly outside normal range - please consult your doctor.'}`}
-                          </p>
-                          
-                          {status !== 'normal' && (
-                            <div className={
-                              statusColor === 'green' ? 'bg-green-50 border-l-4 border-green-500 p-3 rounded' : 
-                              statusColor === 'yellow' ? 'bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded' :
-                              'bg-red-50 border-l-4 border-red-500 p-3 rounded'
-                            }>
-                              <div className="flex">
-                                <div className="flex-shrink-0">
-                                  <AlertTriangle className={
-                                    statusColor === 'green' ? 'h-5 w-5 text-green-500' :
-                                    statusColor === 'yellow' ? 'h-5 w-5 text-yellow-500' :
-                                    'h-5 w-5 text-red-500'
-                                  } />
-                                </div>
-                                <div className="ml-3">
-                                  <h3 className={
-                                    statusColor === 'green' ? 'text-sm font-medium text-green-800' :
-                                    statusColor === 'yellow' ? 'text-sm font-medium text-yellow-800' :
-                                    'text-sm font-medium text-red-800'
-                                  }>
-                                    {status === 'warning' ? 'Attention Needed' : 'Medical Attention Recommended'}
-                                  </h3>
-                                  <div className={
-                                    statusColor === 'green' ? 'mt-1 text-sm text-green-700' :
-                                    statusColor === 'yellow' ? 'mt-1 text-sm text-yellow-700' :
-                                    'mt-1 text-sm text-red-700'
-                                  }>
-                                    <p>
-                                      {status === 'warning' ? 
-                                        `Your ${chart.metric.toLowerCase()} is slightly outside the normal range.` : 
-                                        `Your ${chart.metric.toLowerCase()} is significantly outside the normal range.`}
-                                    </p>
-                                    <p className="mt-1 font-medium">
-                                      Consider consulting your healthcare provider about this result.
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) :(
-        <div className="text-center py-8">
-          <BarChart3 className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600">No chart data available</p>
-          <button
-            onClick={fetchVisualInsights}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-          >
-            Generate Health Trends
-          </button>
-        </div>
-      )}
-    </>
-  )}
-</div>
-
-            {/* Consent Requests */}
+            {/* consent */}
             <ConsentRequests
               consentRequests={consentRequests}
               handleConsentResponse={handleConsentResponse}
             />
-            
-           
+            {/* Health Goals */}
+            <HealthGoals />
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Privacy Settings */}
+                  {/* Privacy Settings */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2" />
@@ -1215,93 +830,8 @@ function highlightKeywords(text) {
                 togglePersonalDetail={togglePersonalDetail}
               />
             </div>
-               {/* preventive insights */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mt-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold flex items-center">
-          <HeartPulse className="w-5 h-5 mr-2 text-green-600" />
-          AI Preventive Advice
-          {generatingAdvice && (
-            <div className="ml-2 animate-spin">
-              <Zap className="w-4 h-4 text-green-600" />
-            </div>
-          )}
-        </h2>
-    
-        {/* View Toggle */}
-        <div className="flex bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => setAdviceView("overall")}
-            className={`px-2.5 py-1 rounded-md text-sm font-medium transition-colors ${
-              adviceView === "overall"
-                ? "bg-white text-green-600 shadow-sm"
-                : "text-gray-600 hover:text-green-600"
-            }`}
-          >
-            <Layers className="w-4 h-4 inline mr-1" />
-            Overall
-          </button>
-      
-        </div>
-      </div>
-    
-      {/* Overall Advice View */}
-      {adviceView === "overall" && (
-        <div className="space-y-4 h-[400px] overflow-y-auto">
-          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-green-800">
-                Overall preventive guidance for your reports
-              </span>
-            </div>
-            <button
-              onClick={generateOverallPreventiveAdvice}
-              disabled={generatingAdvice}
-              className="px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 disabled:opacity-50"
-            >
-              {generatingAdvice ? "Analyzing..." : "Refresh Advice"}
-            </button>
-          </div>
-    
-          {overallPreventiveAdvice ? (
-            <div className="p-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border border-green-200">
-              <div className="flex items-center space-x-2 mb-3">
-                <HeartPulse className="w-5 h-5 text-green-600" />
-                <h3 className="font-bold text-green-800">
-                  Overall Preventive Health Plan
-                </h3>
-              </div>
-              <div className="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-medium">
-                {overallPreventiveAdvice}
-              </div>
-              <div className="mt-2 text-xs text-gray-500">
-                Generated: {new Date().toLocaleString()}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              {generatingAdvice ? (
-                <div className="animate-pulse">
-                  <HeartPulse className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                  <p>Generating overall preventive advice...</p>
-                </div>
-              ) : (
-                <>
-                  <FileStack className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                  <p>Upload health reports to generate preventive advice.</p>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    
-     
-    </div>
 
-                     {/* ai insights */}
+            {/* ai insights */}
 <div className="bg-white rounded-xl shadow-sm p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -1457,9 +987,93 @@ function highlightKeywords(text) {
         </div>
       )}
     </div>
-     {/* Health Goals */}
-            <HealthGoals />
-     
+
+    {/* preventive insights */}
+    <div className="bg-white rounded-xl shadow-sm p-4 mt-8">
+  {/* Header */}
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-xl font-bold flex items-center">
+      <HeartPulse className="w-5 h-5 mr-2 text-green-600" />
+      AI Preventive Advice
+      {generatingAdvice && (
+        <div className="ml-2 animate-spin">
+          <Zap className="w-4 h-4 text-green-600" />
+        </div>
+      )}
+    </h2>
+
+    {/* View Toggle */}
+    <div className="flex bg-gray-100 rounded-lg p-1">
+      <button
+        onClick={() => setAdviceView("overall")}
+        className={`px-2.5 py-1 rounded-md text-sm font-medium transition-colors ${
+          adviceView === "overall"
+            ? "bg-white text-green-600 shadow-sm"
+            : "text-gray-600 hover:text-green-600"
+        }`}
+      >
+        <Layers className="w-4 h-4 inline mr-1" />
+        Overall
+      </button>
+  
+    </div>
+  </div>
+
+  {/* Overall Advice View */}
+  {adviceView === "overall" && (
+    <div className="space-y-4 h-[400px] overflow-y-auto">
+      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <Sparkles className="w-4 h-4 text-green-600" />
+          <span className="text-sm text-green-800">
+            Overall preventive guidance for your reports
+          </span>
+        </div>
+        <button
+          onClick={generateOverallPreventiveAdvice}
+          disabled={generatingAdvice}
+          className="px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 disabled:opacity-50"
+        >
+          {generatingAdvice ? "Analyzing..." : "Refresh Advice"}
+        </button>
+      </div>
+
+      {overallPreventiveAdvice ? (
+        <div className="p-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border border-green-200">
+          <div className="flex items-center space-x-2 mb-3">
+            <HeartPulse className="w-5 h-5 text-green-600" />
+            <h3 className="font-bold text-green-800">
+              Overall Preventive Health Plan
+            </h3>
+          </div>
+          <div className="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-medium">
+            {overallPreventiveAdvice}
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            Generated: {new Date().toLocaleString()}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          {generatingAdvice ? (
+            <div className="animate-pulse">
+              <HeartPulse className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <p>Generating overall preventive advice...</p>
+            </div>
+          ) : (
+            <>
+              <FileStack className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <p>Upload health reports to generate preventive advice.</p>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )}
+
+ 
+</div>
+
           </div>
         </div>
       </div>
