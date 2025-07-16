@@ -1457,9 +1457,8 @@ function highlightKeywords(text) {
         </div>
       )}
     </div>
-     {/* Health Goals */}
+          {/* Health Goals */}
             <HealthGoals />
-     
           </div>
         </div>
       </div>
@@ -1495,8 +1494,7 @@ function highlightKeywords(text) {
         </div>
       )}
 
-      {/* Chatbot Widget */}
-      <ChatbotWidget />
+ 
     </div>
   );
 };

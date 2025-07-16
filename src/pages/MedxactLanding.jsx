@@ -10,6 +10,9 @@ import {
   QrCode,
   Share2,
   Star,
+  CreditCard,
+  Building2,
+  Briefcase,
 } from "lucide-react";
 
 export default function MedxactLanding() {
@@ -89,6 +92,27 @@ export default function MedxactLanding() {
       role: t("review3Role"),
       review: t("review3Text"),
       rating: 5,
+    },
+  ];
+
+  const plans = [
+    {
+      icon: CreditCard,
+      title: "Freemium + Premium Subscription",
+      description:
+        "Free: Basic file uploads, vaccine tracking, limited storage. Premium: Higher storage, AI insights, support, multi-device sync.",
+    },
+    {
+      icon: Building2,
+      title: "White-Label Licensing",
+      description:
+        "Offer Medxact as a custom-branded solution for hospitals or NGOs managing immunization programs.",
+    },
+    {
+      icon: Briefcase,
+      title: "Digital Health Marketplace",
+      description:
+        "Integrate doctor consultations, lab tests, vaccine bookings, and earn commissions from 3rd-party services.",
     },
   ];
 
@@ -183,6 +207,32 @@ export default function MedxactLanding() {
                   </h3>
                 </div>
                 <p className="text-gray-500">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PAYMENT PLANS SECTION */}
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Payment Plans</h2>
+          <p className="text-xl text-gray-500 font-light mb-12">
+            Choose the plan that suits your needs. Scale with Medxact.
+          </p>
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((plan, index) => (
+              <div
+                key={index}
+                className="bg-green-50 p-8 rounded-3xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 group text-left"
+              >
+                <div className="flex items-center mb-6">
+                  <plan.icon className="h-8 w-8 text-emerald-600 mr-4" />
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {plan.title}
+                  </h3>
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed">{plan.description}</p>
               </div>
             ))}
           </div>

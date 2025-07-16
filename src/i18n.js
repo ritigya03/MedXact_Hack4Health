@@ -15,80 +15,85 @@ i18n.use(initReactI18next).init({
         ai: "AI",
 
         // LANDING PAGE
-        headingLine1: "Your Health,",
-        headingLine2: "Your Control",
-        description: "Manage and share your medical records securely.",
-        tagline: "Blockchain-backed • Privacy-first • AI-enabled",
-        accessData: "Access My Health Data",
+        headingLine1: "Smarter Health,",
+        headingLine2: "Stronger Prevention",
+        description:
+          "Upload your health reports and unlock AI-driven insights, preventive measures, lifestyle advice, and personalized goals — all in one secure platform.",
+        tagline: "AI Insights • Early Detection • Personalized Prevention",
+        accessData: "Smarter Preventive Care",
         explore: "Explore MEDXACT",
-        getStarted: "Get Started Now →",
+        getStarted: "Start My Preventive Journey →",
 
-        aboutTitle: "Transforming Healthcare Data",
+        aboutTitle: "Transforming Preventive Healthcare",
         aboutDescription:
-          "MEDXACT empowers patients with complete control over their health records through cutting-edge technology and privacy-first design.",
+          "MEDXACT bridges the gap between patients and doctors through real-time health insights, personalized prevention plans, and secure data sharing. Our AI models analyze your reports and daily data to deliver actionable recommendations — from medical advice to Ayurveda and home remedies — helping you stay healthy and ahead of risks.",
 
-        featuresTitle: "Advanced Features",
+        featuresTitle: "Your Preventive Care Command Center",
         featuresSubtitle:
-          "Everything you need for modern healthcare management.",
+          "Everything you need for proactive health management.",
 
-        featureHealthTrackerTitle: "Health Tracker",
+        featureHealthTrackerTitle: "Upload & Analyze Reports",
         featureHealthTrackerDesc:
-          "Monitors your vitals, medication and health trends with real-time analysis.",
+          "Upload your health reports and receive instant AI summaries, test explanations, and preventive recommendations tailored to your unique health profile.",
 
         featureAIInsightsTitle: "AI Health Insights",
         featureAIInsightsDesc:
-          "Personalized health recommendations in simple language.",
+          "Get personalized insights on health risks, lifestyle changes, diet plans, and even Ayurveda and home remedies, delivered in easy language and visual graphs.",
 
-        featureSmartConsentTitle: "Smart Consent",
+        featureSmartConsentTitle: "Smart Privacy & Consent",
         featureSmartConsentDesc:
-          "AI-powered privacy protection for your sensitive data.",
+          "AI-powered privacy tools keep your preventive health data secure.",
 
-        featureSecureCommTitle: "Secure Communication",
+        featureSecureCommTitle: "Doctor Collaboration",
         featureSecureCommDesc:
-          "Encrypted doctor-to-doctor collaboration platform.",
+          "Doctors can securely connect with patients, request consent, and collaborate on preventive care and goals.",
 
-        featureEmergencyAccessTitle: "Emergency Access",
+        featureEmergencyAccessTitle: "Real-Time Alerts",
         featureEmergencyAccessDesc:
-          "Instant critical information sharing, even offline.",
+          "Instant alerts for critical report findings, enabling timely action and appointments.",
 
-        featureAnonResearchTitle: "Anonymous Research",
+        featureAnonResearchTitle: "Anonymous Preventive Research",
         featureAnonResearchDesc:
-          "Contribute to medical breakthroughs while staying private.",
+          "Contribute anonymously to prevention-focused medical research.",
 
-        featureSecureStorageTitle: "Secure Storage",
-        featureSecureStorageDesc: "Blockchain-verified medical records.",
+        featureSecureStorageTitle: "Secure Health Records",
+        featureSecureStorageDesc:
+          "All your preventive care records, safely stored and easy to access.",
 
-        featurePrivacyControlTitle: "Privacy Control",
-        featurePrivacyControlDesc: "You decide who sees your data.",
+        featurePrivacyControlTitle: "Privacy & Control",
+        featurePrivacyControlDesc:
+          "You decide how your preventive health data is shared.",
 
-        featureResearchImpactTitle: "Research Impact",
-        featureResearchImpactDesc: "Anonymous contribution to science.",
+        featureResearchImpactTitle: "Impactful Research",
+        featureResearchImpactDesc:
+          "Help drive advances in preventive medicine anonymously.",
 
-        reviewsTitle: "Trusted by Healthcare Professionals",
-        reviewsSubtitle: "See what our users have to say.",
+        reviewsTitle: "Trusted by Patients & Healthcare Experts",
+        reviewsSubtitle:
+          "Hear how MEDXACT empowers proactive, preventive care.",
 
         review1Name: "Rina Sharma",
         review1Role: "Patient",
         review1Text:
-          "It transformed my diabetes management. Everything is seamlessly accessible.",
+          "MEDXACT gave me clear, personalized advice about my reports. The AI insights and lifestyle tips help me feel more in control of my health.",
 
         review2Name: "Dr. Ahuja",
         review2Role: "Medical Professional",
         review2Text:
-          "The secure collaboration features save hours and improve patient outcomes.",
+          "As a doctor, I save hours collaborating securely with patients. The early warning alerts and goal tracking truly support preventive medicine.",
 
         review3Name: "S.K.",
         review3Role: "Privacy Advocate",
         review3Text:
-          "Finally, a platform that truly respects patient privacy and data control.",
+          "Finally, a health platform that respects privacy while delivering advanced preventive care.",
 
-        ctaTitle: "Ready to Take Control of Your Health Data?",
+        ctaTitle: "Ready for Smarter Preventive Care?",
         ctaSubtitle:
-          "Join patients and healthcare professionals building a privacy-first healthcare future with MEDXACT.",
-        ctaButton: "Access MEDXACT Now",
+          "Join MEDXACT to transform how you and your doctor manage health, prevent risks, and stay ahead.",
+        ctaButton: "Start My Preventive Journey",
 
         footerDescription:
-          "Empowering patients through secure, intelligent healthcare technology.",
+          "Empowering smarter preventive healthcare through secure, intelligent technology.",
         footerRights: "All rights reserved.",
 
         // HEADINGS (from your settings file)
@@ -132,86 +137,90 @@ i18n.use(initReactI18next).init({
         medxact: "मेडएक्सैक्ट",
         dashboard: "डैशबोर्ड",
         profile: "प्रोफ़ाइल",
-        settings: "सेटिंग्स",
+        Vaccine: "वैक्सीन",
         contact: "संपर्क",
         ai: "एआई",
 
         // LANDING PAGE
-        headingLine1: "आपका स्वास्थ्य,",
-        headingLine2: "आपका नियंत्रण",
+        headingLine1: "स्मार्ट स्वास्थ्य,",
+        headingLine2: "मजबूत रोकथाम",
         description:
-          "अपने मेडिकल रिकॉर्ड को सुरक्षित रूप से प्रबंधित और साझा करें।",
-        tagline: "ब्लॉकचेन-समर्थित • गोपनीयता-प्रथम • एआई-सक्षम",
-        accessData: "मेरे स्वास्थ्य डेटा तक पहुँचें",
+          "अपने मेडिकल रिकॉर्ड अपलोड करें और एआई-आधारित अंतर्दृष्टि, निवारक उपाय, जीवनशैली सलाह, और व्यक्तिगत लक्ष्यों को एक ही सुरक्षित प्लेटफॉर्म पर प्राप्त करें।",
+        tagline: "एआई अंतर्दृष्टि • जल्दी पहचान • व्यक्तिगत निवारण",
+        accessData: "स्मार्ट रोग-प्रतिरोधक देखभाल",
         explore: "MEDXACT का अन्वेषण करें",
-        getStarted: "अब शुरू करें →",
+        getStarted: "मेरी निवारक यात्रा शुरू करें →",
 
-        aboutTitle: "हेल्थकेयर डेटा को बदलना",
+        aboutTitle: "निवारक स्वास्थ्य देखभाल में बदलाव",
         aboutDescription:
-          "MEDXACT उन्नत तकनीक और गोपनीयता-प्रथम डिज़ाइन के माध्यम से रोगियों को पूरा नियंत्रण देता है।",
+          "MEDXACT मरीजों और डॉक्टरों के बीच की दूरी को कम करता है, वास्तविक समय की स्वास्थ्य अंतर्दृष्टियों, व्यक्तिगत निवारक योजनाओं और सुरक्षित डेटा साझाकरण के माध्यम से। हमारे एआई मॉडल आपके रिपोर्ट और दैनिक डेटा का विश्लेषण करके कार्रवाई योग्य सिफारिशें प्रदान करते हैं — चिकित्सा सलाह से लेकर आयुर्वेद और घरेलू उपायों तक — ताकि आप स्वस्थ रहें और जोखिमों से आगे रहें।",
 
-        featuresTitle: "उन्नत विशेषताएँ",
+        featuresTitle: "आपका निवारक देखभाल कमांड सेंटर",
         featuresSubtitle:
-          "आधुनिक स्वास्थ्य देखभाल प्रबंधन के लिए आवश्यक सब कुछ।",
+          "सक्रिय स्वास्थ्य प्रबंधन के लिए आवश्यक हर चीज।",
 
-        featureHealthTrackerTitle: "हेल्थ ट्रैकर",
+        featureHealthTrackerTitle: "रिपोर्ट अपलोड और विश्लेषण",
         featureHealthTrackerDesc:
-          "आपकी महत्वपूर्ण जानकारियाँ, दवाइयाँ और स्वास्थ्य प्रवृत्तियों की वास्तविक समय में निगरानी करता है।",
+          "अपनी स्वास्थ्य रिपोर्ट अपलोड करें और तुरंत एआई सारांश, टेस्ट व्याख्या और व्यक्तिगत निवारक अनुशंसाएँ प्राप्त करें।",
 
-        featureAIInsightsTitle: "एआई स्वास्थ्य इनसाइट्स",
+        featureAIInsightsTitle: "एआई स्वास्थ्य अंतर्दृष्टियाँ",
         featureAIInsightsDesc:
-          "सरल भाषा में व्यक्तिगत स्वास्थ्य अनुशंसाएँ।",
+          "स्वास्थ्य जोखिमों, जीवनशैली परिवर्तनों, आहार योजनाओं और यहां तक कि आयुर्वेद और घरेलू उपचारों पर व्यक्तिगत अंतर्दृष्टि प्राप्त करें, सरल भाषा और दृश्य ग्राफ़ में।",
 
-        featureSmartConsentTitle: "स्मार्ट सहमति",
+        featureSmartConsentTitle: "स्मार्ट गोपनीयता और सहमति",
         featureSmartConsentDesc:
-          "आपके संवेदनशील डेटा के लिए एआई-संचालित गोपनीयता सुरक्षा।",
+          "आपके निवारक स्वास्थ्य डेटा को सुरक्षित रखने के लिए एआई-संचालित गोपनीयता उपकरण।",
 
-        featureSecureCommTitle: "सुरक्षित संचार",
+        featureSecureCommTitle: "डॉक्टर सहयोग",
         featureSecureCommDesc:
-          "डॉक्टर-टू-डॉक्टर एन्क्रिप्टेड सहयोग मंच।",
+          "डॉक्टर मरीजों से सुरक्षित रूप से जुड़ सकते हैं, सहमति का अनुरोध कर सकते हैं और निवारक देखभाल और लक्ष्यों पर सहयोग कर सकते हैं।",
 
-        featureEmergencyAccessTitle: "आपातकालीन पहुँच",
+        featureEmergencyAccessTitle: "रीयल-टाइम अलर्ट",
         featureEmergencyAccessDesc:
-          "तत्काल महत्वपूर्ण जानकारी साझा करना, यहां तक कि ऑफलाइन भी।",
+          "महत्वपूर्ण रिपोर्ट निष्कर्षों के लिए तुरंत अलर्ट, समय पर कार्रवाई और नियुक्तियों को सक्षम करते हैं।",
 
-        featureAnonResearchTitle: "गुमनाम अनुसंधान",
+        featureAnonResearchTitle: "गुमनाम निवारक अनुसंधान",
         featureAnonResearchDesc:
-          "गोपनीय रहते हुए चिकित्सा अनुसंधान में योगदान करें।",
+          "निवारण-केंद्रित चिकित्सा अनुसंधान में गुमनाम रूप से योगदान करें।",
 
-        featureSecureStorageTitle: "सुरक्षित भंडारण",
-        featureSecureStorageDesc: "ब्लॉकचेन-सत्यापित मेडिकल रिकॉर्ड।",
+        featureSecureStorageTitle: "सुरक्षित स्वास्थ्य रिकॉर्ड",
+        featureSecureStorageDesc:
+          "आपके सभी निवारक देखभाल रिकॉर्ड सुरक्षित रूप से संग्रहीत और आसानी से उपलब्ध।",
 
-        featurePrivacyControlTitle: "गोपनीयता नियंत्रण",
-        featurePrivacyControlDesc: "आप तय करते हैं कि आपका डेटा कौन देख सकता है।",
+        featurePrivacyControlTitle: "गोपनीयता और नियंत्रण",
+        featurePrivacyControlDesc:
+          "आप तय करते हैं कि आपका निवारक स्वास्थ्य डेटा कैसे साझा किया जाए।",
 
-        featureResearchImpactTitle: "अनुसंधान प्रभाव",
-        featureResearchImpactDesc: "विज्ञान में गुमनाम योगदान।",
+        featureResearchImpactTitle: "प्रभावशाली अनुसंधान",
+        featureResearchImpactDesc:
+          "निवारक चिकित्सा में प्रगति को गुमनाम रूप से आगे बढ़ाने में मदद करें।",
 
-        reviewsTitle: "स्वास्थ्य पेशेवरों द्वारा विश्वसनीय",
-        reviewsSubtitle: "हमारे उपयोगकर्ताओं की राय जानें।",
+        reviewsTitle: "मरीजों और स्वास्थ्य विशेषज्ञों द्वारा विश्वसनीय",
+        reviewsSubtitle:
+          "जानिए कैसे MEDXACT सक्रिय, निवारक देखभाल को सशक्त बनाता है।",
 
         review1Name: "रीना शर्मा",
         review1Role: "रोगी",
         review1Text:
-          "इसने मेरी डायबिटीज प्रबंधन को बदल दिया। सब कुछ सहजता से सुलभ है।",
+          "MEDXACT ने मुझे मेरी रिपोर्टों के बारे में स्पष्ट, व्यक्तिगत सलाह दी। एआई अंतर्दृष्टि और जीवनशैली सुझावों ने मुझे अपने स्वास्थ्य पर नियंत्रण का एहसास दिलाया।",
 
         review2Name: "डॉ. आहूजा",
         review2Role: "चिकित्सा पेशेवर",
         review2Text:
-          "सुरक्षित सहयोग सुविधाएँ घंटों बचाती हैं और रोगी परिणामों को बेहतर बनाती हैं।",
+          "डॉक्टर के रूप में, मैं मरीजों के साथ सुरक्षित रूप से सहयोग करके घंटों बचाता हूं। शुरुआती चेतावनी अलर्ट और लक्ष्य ट्रैकिंग वास्तव में निवारक चिकित्सा का समर्थन करते हैं।",
 
         review3Name: "एस. के.",
         review3Role: "गोपनीयता समर्थक",
         review3Text:
-          "अंततः, एक ऐसा प्लेटफॉर्म जो वास्तव में रोगी की गोपनीयता और डेटा नियंत्रण का सम्मान करता है।",
+          "अंततः, एक ऐसा स्वास्थ्य प्लेटफॉर्म जो गोपनीयता का सम्मान करता है और उन्नत निवारक देखभाल प्रदान करता है।",
 
-        ctaTitle: "क्या आप अपने स्वास्थ्य डेटा का नियंत्रण चाहते हैं?",
+        ctaTitle: "स्मार्ट निवारक देखभाल के लिए तैयार हैं?",
         ctaSubtitle:
-          "MEDXACT के साथ गोपनीयता-प्रथम स्वास्थ्य भविष्य का निर्माण करें।",
-        ctaButton: "अब MEDXACT एक्सेस करें",
+          "MEDXACT के साथ जुड़ें और यह बदलें कि आप और आपके डॉक्टर स्वास्थ्य का प्रबंधन कैसे करते हैं, जोखिमों को कैसे रोकते हैं और आगे कैसे रहते हैं।",
+        ctaButton: "मेरी निवारक यात्रा शुरू करें",
 
         footerDescription:
-          "सुरक्षित, बुद्धिमान स्वास्थ्य तकनीक के माध्यम से रोगियों को सशक्त बनाना।",
+          "सुरक्षित और बुद्धिमान तकनीक के माध्यम से स्मार्ट निवारक स्वास्थ्य देखभाल को सशक्त बनाना।",
         footerRights: "सर्वाधिकार सुरक्षित।",
 
         // HEADINGS

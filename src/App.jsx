@@ -14,6 +14,8 @@ import Onboarding from "./pages/Patient/Onboarding";
 import DoctorProfile from "./pages/Doctor/Profile";
 import DoctorOnboarding from "./pages/Doctor/Onboarding";
 import DoctorDashboard from "./pages/Doctor/Dashboard";
+import DoctorAppointments from "./pages/Doctor/appointment";
+import ChatbotWidget from "./components/ChatbotWidget";
 
 import './App.css';
 import "./i18n";
@@ -21,6 +23,9 @@ import "./i18n";
 function App() {
   return (
     <Router>
+      {/* Global Chatbot Widget */}
+      <ChatbotWidget />
+
       <Routes>
         {/* Redirect root path to landing page */}
         <Route path="/" element={<Navigate to="/landing-page" replace />} />
@@ -36,12 +41,14 @@ function App() {
         <Route path="/patient/profile" element={<PatientProfile />} />
         <Route path="/patient/Vaccine" element={<Vaccine />} />
         <Route path="/patient/contact" element={<ContactUs />} />
+
         <Route path="/onboarding" element={<Onboarding />} />
 
         {/* Doctor Routes */}
         <Route path="/doctor/profile" element={<DoctorProfile />} />
         <Route path="/doctor/onboarding" element={<DoctorOnboarding />} />
         <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+        {/* <Route path="/doctor/appointments" element={<DoctorAppointments />} /> */}
       </Routes>
     </Router>
   );

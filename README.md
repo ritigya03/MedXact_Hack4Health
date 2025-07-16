@@ -4,7 +4,7 @@
 Many serious health problems are not caught early. Most healthcare systems only act after someone gets sick. Because of this, diseases are diagnosed late, patients end up in emergencies, and many hospital visits could have been avoided.
 
 ## Solution
-**MEDXact** transforms healthcare from **reactive to proactive** by using AI to:
+*MEDXact* transforms healthcare from *reactive to proactive* by using AI to:
 
 - Analyze medical reports and detect early health risks  
 - Trigger real-time alerts to doctors when danger signs emerge  
@@ -13,12 +13,12 @@ Many serious health problems are not caught early. Most healthcare systems only 
 
 ## ⚙️ Features
 
-- **AI Medical Insight**: Understand trends, deficiencies, and risks in uploaded health reports  
-- **Doctor Appointment Management**: Patients book, doctors manage  
-- **AI Chatbot**: Personalized health advice using Mixtral-8x7B  
-- **Vaccine Tracker**: Manage past vaccines, schedule next doses, and get reminders  
-- **Smart Alerts**: Early warnings to doctors/patients when reports show red flags  
-- **Health Dashboard**: Visualize your health data, progress, and goals
+- *AI Medical Insight*: Understand trends, deficiencies, and risks in uploaded health reports  
+- *Doctor Appointment Management*: Patients book, doctors manage  
+- *AI Chatbot*: Personalized health advice using Mixtral-8x7B  
+- *Vaccine Tracker*: Manage past vaccines, schedule next doses, and get reminders  
+- *Smart Alerts*: Early warnings to doctors/patients when reports show red flags  
+- *Health Dashboard*: Visualize your health data, progress, and goals
 
 ##  Impact
 
@@ -26,7 +26,7 @@ Many serious health problems are not caught early. Most healthcare systems only 
 - Doctors catch problems earlier  
 - Hospitals reduce unnecessary emergency cases  
 
-Together, **MEDXact** brings a proactive, data-driven shift in Indian preventive healthcare.
+Together, *MEDXact* brings a proactive, data-driven shift in Indian preventive healthcare.
 
 ---
 
@@ -80,7 +80,7 @@ Inside /backend, create a .env file:
 HF_TOKEN=your-huggingface-token-here
 TOGETHER_API_KEY=your-together-api-key-here
 
-```
+
 How to Use
 
 👨‍⚕️ Doctor Flow
@@ -98,4 +98,3 @@ Get reminders
 Upload certificates
 Chat with Vaccine Advisor
 Track health progress over time
-

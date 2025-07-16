@@ -4,6 +4,7 @@ import { db, auth } from "../../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import AddVaccineForm from "./AddVaccineForm"; // Adjust path if needed
 import VaccineChatbot from "../../components/VaccineChatbot"; // if you separate it
+import Navbar from "../../components/Navbar";
 
 export default function Vaccine() {
   const [vaccines, setVaccines] = useState([]);
@@ -24,7 +25,8 @@ export default function Vaccine() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Your Vaccines</h1>
+      <Navbar></Navbar>
+      <h1 className="text-2xl font-bold mt-20 mb-4">Your Vaccines</h1>
 
       {/* ✅ Add Vaccine Form here */}
       <AddVaccineForm onAdd={fetchVaccines} />

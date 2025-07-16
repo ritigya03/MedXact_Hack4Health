@@ -9,11 +9,12 @@ import {
   getDoc,
   doc,
   addDoc,
+  updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import Navbar from "../../components/Navbar";
-import { Send, Eye } from "lucide-react";
+import { Send, Eye, CheckCircle, Clock, Target } from "lucide-react";
 
 export default function DoctorDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +24,7 @@ export default function DoctorDashboard() {
   const [timelineMinutes, setTimelineMinutes] = useState("");
   const [consentSent, setConsentSent] = useState(false);
   const [approvedConsents, setApprovedConsents] = useState([]);
+  const [activeTab, setActiveTab] = useState("reports"); // "reports" or "goals"
 
   useEffect(() => {
     const fetchDoctorData = async () => {
@@ -123,6 +125,21 @@ export default function DoctorDashboard() {
         console.error("Error fetching health records:", err);
       }
 
+      // Fetch healthGoals from Firestore
+      let healthGoals = [];
+      try {
+        const healthGoalsSnap = await getDocs(
+          collection(db, "patients", patient.id, "healthGoals")
+        );
+
+        healthGoals = healthGoalsSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } catch (err) {
+        console.error("Error fetching health goals:", err);
+      }
+
       // Check for approved consents
       const approvedConsentsList = await checkApprovedConsents(patient.id);
       setApprovedConsents(approvedConsentsList);
@@ -131,6 +148,7 @@ export default function DoctorDashboard() {
         id: patient.id,
         ...data,
         reports: healthRecords,
+        healthGoals: healthGoals,
       });
 
       setConsentSent(false);
@@ -178,6 +196,33 @@ export default function DoctorDashboard() {
     }
   };
 
+  const handleToggleGoal = async (goalId, currentStatus) => {
+    if (!hasApprovedConsent()) {
+      alert("You need approved consent to update health goals.");
+      return;
+    }
+
+    try {
+      await updateDoc(
+        doc(db, "patients", selectedPatient.id, "healthGoals", goalId),
+        {
+          done: !currentStatus,
+        }
+      );
+
+      // Update local state
+      setSelectedPatient(prev => ({
+        ...prev,
+        healthGoals: prev.healthGoals.map(goal =>
+          goal.id === goalId ? { ...goal, done: !currentStatus } : goal
+        )
+      }));
+    } catch (err) {
+      console.error("Error updating health goal:", err);
+      alert("Failed to update health goal.");
+    }
+  };
+
   const handleViewFile = (url) => {
     if (url) {
       window.open(url, '_blank');
@@ -186,6 +231,26 @@ export default function DoctorDashboard() {
 
   const hasApprovedConsent = () => {
     return approvedConsents.length > 0;
+  };
+
+  const getGoalStatusColor = (done) => {
+    return done ? "text-green-600 bg-green-100" : "text-yellow-600 bg-yellow-100";
+  };
+
+  const getGoalStatusIcon = (done) => {
+    return done ? <CheckCircle className="w-4 h-4" /> : <Clock className="w-4 h-4" />;
+  };
+
+  const formatGoalDate = (timestamp) => {
+    if (!timestamp) return "No date";
+    
+    // Handle Firestore timestamp
+    if (timestamp.seconds) {
+      return new Date(timestamp.seconds * 1000).toLocaleDateString();
+    }
+    
+    // Handle regular date string
+    return new Date(timestamp).toLocaleDateString();
   };
 
   return (
@@ -204,6 +269,7 @@ export default function DoctorDashboard() {
               placeholder="Search by Unique ID, Email, or Full Name"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
             <button
               onClick={handleSearch}
@@ -265,82 +331,195 @@ export default function DoctorDashboard() {
                   </p>
                 </div>
               </div>
+
+              {/* Health Goals Summary */}
+              {selectedPatient.healthGoals && selectedPatient.healthGoals.length > 0 && (
+                <div className="mt-6 pt-4 border-t">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Health Goals Summary</h4>
+                  <div className="flex gap-2 text-xs">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                      ✅ {selectedPatient.healthGoals.filter(g => g.done).length} Completed
+                    </span>
+                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                      ⏳ {selectedPatient.healthGoals.filter(g => !g.done).length} Pending
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Reports Table */}
+            {/* Main Content Area with Tabs */}
             <div className="lg:col-span-2 bg-white border border-teal-200 rounded-lg p-6">
-              <h3 className="text-teal-800 text-lg font-semibold mb-4">
-                Medical Reports ({selectedPatient.reports.length})
-                {hasApprovedConsent() && (
-                  <span className="ml-2 text-sm text-green-600 bg-green-100 px-2 py-1 rounded">
-                    ✅ Consent Approved
-                  </span>
-                )}
-              </h3>
+              {/* Tab Navigation */}
+              <div className="flex mb-6 border-b">
+                <button
+                  onClick={() => setActiveTab("reports")}
+                  className={`flex items-center gap-2 px-4 py-2 font-medium ${
+                    activeTab === "reports"
+                      ? "text-teal-600 border-b-2 border-teal-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  📋 Medical Reports ({selectedPatient.reports.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab("goals")}
+                  className={`flex items-center gap-2 px-4 py-2 font-medium ${
+                    activeTab === "goals"
+                      ? "text-teal-600 border-b-2 border-teal-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Target className="w-4 h-4" />
+                  Health Goals ({selectedPatient.healthGoals?.length || 0})
+                </button>
+              </div>
 
-              {selectedPatient.reports.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm text-left">
-                    <thead>
-                      <tr className="border-b border-teal-100">
-                        <th className="py-3 px-4 font-medium text-gray-700">
-                          File Name
-                        </th>
-                        <th className="py-3 px-4 font-medium text-gray-700">
-                          Type
-                        </th>
-                        <th className="py-3 px-4 font-medium text-gray-700">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedPatient.reports.map((report, index) => (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-100 hover:bg-teal-50"
+              {/* Consent Status */}
+              {hasApprovedConsent() && (
+                <div className="mb-4">
+                  <span className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                    ✅ Consent Approved - You can view and update patient data
+                  </span>
+                </div>
+              )}
+
+              {/* Reports Tab */}
+              {activeTab === "reports" && (
+                <div>
+                  <h3 className="text-teal-800 text-lg font-semibold mb-4">
+                    Medical Reports ({selectedPatient.reports.length})
+                  </h3>
+
+                  {selectedPatient.reports.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm text-left">
+                        <thead>
+                          <tr className="border-b border-teal-100">
+                            <th className="py-3 px-4 font-medium text-gray-700">
+                              File Name
+                            </th>
+                            <th className="py-3 px-4 font-medium text-gray-700">
+                              Type
+                            </th>
+                            <th className="py-3 px-4 font-medium text-gray-700">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedPatient.reports.map((report, index) => (
+                            <tr
+                              key={index}
+                              className="border-b border-gray-100 hover:bg-teal-50"
+                            >
+                              <td className="py-3 px-4">
+                                {report.name || "-"}
+                              </td>
+                              <td className="py-3 px-4">
+                                {report.type || "-"}
+                              </td>
+                              <td className="py-3 px-4">
+                                <div className="flex gap-2">
+                                  {hasApprovedConsent() ? (
+                                    <button
+                                      onClick={() => handleViewFile(report.url)}
+                                      className="flex items-center gap-1 text-green-700 border border-green-200 px-3 py-1 rounded hover:bg-green-50"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                      View
+                                    </button>
+                                  ) : (
+                                    <button className="text-teal-700 border border-teal-200 px-2 py-1 rounded hover:bg-teal-50">
+                                      Request Consent
+                                    </button>
+                                  )}
+                                  {report.url && hasApprovedConsent() && (
+                                    <a
+                                      href={report.url}
+                                      download
+                                      className="text-blue-700 border border-blue-200 px-2 py-1 rounded hover:bg-blue-50"
+                                    >
+                                      Download
+                                    </a>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600">
+                      No health records found for this patient.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Health Goals Tab */}
+              {activeTab === "goals" && (
+                <div>
+                  <h3 className="text-teal-800 text-lg font-semibold mb-4">
+                    Health Goals ({selectedPatient.healthGoals?.length || 0})
+                  </h3>
+
+                  {selectedPatient.healthGoals && selectedPatient.healthGoals.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedPatient.healthGoals.map((goal) => (
+                        <div
+                          key={goal.id}
+                          className={`border rounded-lg p-4 ${
+                            goal.done ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
+                          }`}
                         >
-                          <td className="py-3 px-4">
-                            {report.name || "-"}
-                          </td>
-                          <td className="py-3 px-4">
-                            {report.type || "-"}
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex gap-2">
-                              {hasApprovedConsent() ? (
-                                <button
-                                  onClick={() => handleViewFile(report.url)}
-                                  className="flex items-center gap-1 text-green-700 border border-green-200 px-3 py-1 rounded hover:bg-green-50"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                  View
-                                </button>
-                              ) : (
-                                <button className="text-teal-700 border border-teal-200 px-2 py-1 rounded hover:bg-teal-50">
-                                  Request Consent
-                                </button>
-                              )}
-                              {report.url && hasApprovedConsent() && (
-                                <a
-                                  href={report.url}
-                                  download
-                                  className="text-blue-700 border border-blue-200 px-2 py-1 rounded hover:bg-blue-50"
-                                >
-                                  Download
-                                </a>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getGoalStatusColor(goal.done)}`}>
+                                  {getGoalStatusIcon(goal.done)}
+                                  {goal.done ? "Completed" : "In Progress"}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  Created: {formatGoalDate(goal.createdAt)}
+                                </span>
+                              </div>
+                              <h4 className="font-medium text-gray-900 mb-1">
+                                {goal.name}
+                              </h4>
+                              {goal.description && (
+                                <p className="text-sm text-gray-600 mb-2">
+                                  {goal.description}
+                                </p>
                               )}
                             </div>
-                          </td>
-                        </tr>
+                            
+                            {hasApprovedConsent() && (
+                              <button
+                                onClick={() => handleToggleGoal(goal.id, goal.done)}
+                                className={`ml-4 px-3 py-1 text-xs font-medium rounded transition-colors ${
+                                  goal.done
+                                    ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                    : "bg-green-100 text-green-800 hover:bg-green-200"
+                                }`}
+                              >
+                                {goal.done ? "Mark Incomplete" : "Mark Complete"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">
+                        No health goals found for this patient.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <p className="text-gray-600">
-                  No health records found for this patient.
-                </p>
               )}
 
               {/* Consent Request Form - Only show if no approved consent */}
@@ -359,7 +538,7 @@ export default function DoctorDashboard() {
                         type="text"
                         value={purpose}
                         onChange={(e) => setPurpose(e.target.value)}
-                        placeholder="e.g., Review imaging for diagnosis"
+                        placeholder="e.g., Review medical records and update health goals"
                         className="w-full border p-2 rounded-md border-gray-300"
                       />
                     </div>
@@ -403,7 +582,7 @@ export default function DoctorDashboard() {
                   </h3>
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <p className="text-sm text-green-800">
-                      You have approved access to view and download this patient's medical records.
+                      You have approved access to view, download medical records, and update health goals for this patient.
                     </p>
                     {approvedConsents.length > 0 && (
                       <div className="mt-2 text-xs text-green-700">

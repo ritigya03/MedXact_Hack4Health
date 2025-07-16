@@ -3,6 +3,7 @@ import { db, auth, storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
+
 const AddVaccineForm = ({ onAdd }) => {
   const [vaccine, setVaccine] = useState({
     name: "",
@@ -41,6 +42,7 @@ const AddVaccineForm = ({ onAdd }) => {
     <form onSubmit={handleSubmit} className="space-y-6 bg-gray-100 p-6 rounded-xl shadow-md">
   {/* Vaccine Name */}
   <div className="relative">
+    
     <input
       type="text"
       id="vaccineName"
