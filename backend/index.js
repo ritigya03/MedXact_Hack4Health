@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config(); // at top
 import consentAnalysis from "./routes/consentAnalysis.js";
 import healthInsights from "./routes/healthInsights.js"
+import vaccineAdvisor from "./routes/vaccineAdvisor.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json()); // Required to parse JSON body
 
 app.use("/analyze", consentAnalysis); // This means route becomes /analyze/consent-analysis
 app.use("/api/insights", healthInsights); 
+app.use("/api/vaccine-advisor", vaccineAdvisor);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

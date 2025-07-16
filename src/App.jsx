@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import MedxactLanding from "./pages/MedxactLanding";
 import PatientDashboard from "./pages/Patient/Dashboard";
 import PatientProfile from "./pages/Patient/Profile";
-import Settings from "./pages/Patient/Settings";
+import Vaccine from "./pages/Patient/Vaccine";
 import ContactUs from "./pages/Patient/Contact";
 import Onboarding from "./pages/Patient/Onboarding";
 
@@ -34,7 +34,7 @@ function App() {
         {/* Patient Routes */}
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/patient/profile" element={<PatientProfile />} />
-        <Route path="/patient/settings" element={<Settings />} />
+        <Route path="/patient/Vaccine" element={<Vaccine />} />
         <Route path="/patient/contact" element={<ContactUs />} />
         <Route path="/onboarding" element={<Onboarding />} />
 

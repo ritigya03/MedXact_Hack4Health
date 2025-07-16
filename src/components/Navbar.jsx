@@ -13,7 +13,7 @@ export default function Navbar({ userType = "patient" }) {
   const links = [
     { label: "Dashboard", path: "dashboard" },
     { label: "Profile", path: "profile" },
-    { label: "Settings", path: "settings" },
+    { label: "Vaccine", path: "vaccine" },
     { label: "Contact", path: "contact" },
   ];
 
