@@ -189,7 +189,7 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen mt-10 bg-gradient-to-br from-slate-50 to-teal-50">
+    <div className="min-h-screen mt-20">
       <Navbar userType="doctor" />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
