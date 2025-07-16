@@ -97,7 +97,7 @@ const [showCharts, setShowCharts] = useState(false);
     
     try {
       setChartError(null);
-      const response = await fetch('http://localhost:4000/api/visual-insights', {
+      const response = await fetch('https://medxact-hack4health.onrender.com/api/visual-insights', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ patientId: auth.currentUser.uid })
@@ -164,7 +164,7 @@ const [showCharts, setShowCharts] = useState(false);
         message: "Generating overall preventive advice...",
       });
   
-      const res = await fetch("http://localhost:4000/api/preventive-advice", {
+      const res = await fetch("https://medxact-hack4health.onrender.com/api/preventive-advice", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -209,7 +209,7 @@ const [showCharts, setShowCharts] = useState(false);
         message: "Generating AI preventive advice...",
       });
   
-      const res = await fetch("http://localhost:4000/api/preventive-advice", {
+      const res = await fetch("https://medxact-hack4health.onrender.com/api/preventive-advice", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -273,7 +273,7 @@ const [showCharts, setShowCharts] = useState(false);
         textPreview: text.substring(0, 100) + "..."
       });
 
-      const res = await fetch("http://localhost:4000/api/insights", {
+      const res = await fetch("https://medxact-hack4health.onrender.com/api/insights", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -337,7 +337,7 @@ const [showCharts, setShowCharts] = useState(false);
       setGeneratingOverall(true);
       setUploadStatus({ type: "info", message: "Generating overall health insights..." });
 
-      const res = await fetch("http://localhost:4000/api/insights", {
+      const res = await fetch("https://medxact-hack4health.onrender.com/api/insights", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -473,7 +473,7 @@ const [showCharts, setShowCharts] = useState(false);
               }
 
               try {
-                const res = await fetch("http://localhost:4000/analyze", {
+                const res = await fetch("https://medxact-hack4health.onrender.com/analyze", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
