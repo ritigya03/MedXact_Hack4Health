@@ -39,7 +39,7 @@ Together, *MEDXact* brings a proactive, data-driven shift in Indian preventive h
 | AI & NLP       | OpenAI, Together AI (Mixtral 8x7B)        |
 | Database       | Firebase Firestore                        |
 | Charts & UI    | Chart.js, React Chart.js 2                |
-| Hosting        | Firebase / Vercel                         |
+| Hosting        | Firebase / Vercel / Render                |
 
 
 FOLDER STRUCTURE
