@@ -80,7 +80,7 @@ Inside /backend, create a .env file:
 HF_TOKEN=your-huggingface-token-here
 TOGETHER_API_KEY=your-together-api-key-here
 
-
+```
 How to Use
 
 👨‍⚕️ Doctor Flow
