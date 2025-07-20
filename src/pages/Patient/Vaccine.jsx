@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import AddVaccineForm from "./AddVaccineForm";
-import VaccineChatbot from "../../components/VaccineChatbot";
+import AddVaccineForm from "./AddVaccineForm"; // Adjust path if needed
+import VaccineChatbot from "../../components/VaccineChatbot"; // if you separate it
 import Navbar from "../../components/Navbar";
 
 export default function Vaccine() {
@@ -23,100 +23,51 @@ export default function Vaccine() {
     fetchVaccines();
   }, []);
 
-  const cardClass =
-    "bg-white/10 backdrop-blur-md rounded-2xl border border-cyan-200 p-6 sm:p-8 shadow-md";
-
   return (
-    <div
-      className="min-h-screen pb-16"
-      style={{ background: "linear-gradient(to bottom right, #eff6ff, #ccfbf1)" }}
-    >
-      <Navbar userType="patient" />
+    <div className="p-6 max-w-3xl mx-auto">
+      <Navbar></Navbar>
+      <h1 className="text-2xl font-bold mt-20 mb-4">Your Vaccines</h1>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-8 mt-24">
-        <h1 className="text-3xl font-bold text-slate-800 mb-6">
-          💉 Your Vaccination Records
-        </h1>
+      {/* ✅ Add Vaccine Form here */}
+      <AddVaccineForm onAdd={fetchVaccines} />
 
-        <div className={`${cardClass} mb-8`}>
-          <h2 className="text-xl font-semibold text-slate-700 mb-4">
-            Add a New Vaccine
-          </h2>
-          <AddVaccineForm onAdd={fetchVaccines} />
-        </div>
-
-        <div className="space-y-6">
-          {vaccines.length === 0 ? (
-            <p className="text-slate-600 text-sm">No vaccines recorded yet.</p>
-          ) : (
-            vaccines.map((v) => (
-              <div key={v.id} className={cardClass}>
-                <div className="space-y-1 text-sm text-slate-700">
-                  <p>
-                    <span className="font-semibold text-slate-900">Vaccine:</span>{" "}
-                    {v.name}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-slate-900">Type:</span>{" "}
-                    {v.type}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-slate-900">Date Taken:</span>{" "}
-                    {v.date}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-slate-900">Next Dose:</span>{" "}
-                    {v.nextDose || "N/A"}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-slate-900">Notes:</span>{" "}
-                    {v.notes || "N/A"}
-                  </p>
-                  {v.certificateUrl && (
-                    <p>
-                      <a
-                        href={v.certificateUrl}
-                        className="text-teal-600 underline"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View Certificate
-                      </a>
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* 🩺 Post-Vaccine Prevention Tips */}
-        <div
-          className="rounded-2xl border border-cyan-100 p-6 sm:p-8 shadow-md mt-10"
-          style={{
-            backgroundColor: "rgba(255, 248, 225, 0.3)",
-            backdropFilter: "blur(6px)",
-          }}
-        >
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">
-            🩺 Post-Vaccine Prevention Tips
-          </h2>
-          <ul className="list-disc ml-5 text-sm space-y-1 text-slate-700">
-            <li>Avoid heavy physical activity for 24 hours.</li>
-            <li>Stay hydrated and eat light meals.</li>
-            <li>Monitor for allergic reactions or swelling.</li>
-            <li>Rest if feeling feverish or dizzy.</li>
-          </ul>
-        </div>
-
-        {/* 💬 Vaccine Chatbot */}
-        <div className={`${cardClass} mt-10`}>
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">
-            💬 Ask our Vaccine Chatbot
-          </h2>
-          <VaccineChatbot vaccines={vaccines} />
-        </div>
+      {/* ✅ List of vaccine cards */}
+      <div className="mt-8 space-y-4">
+        {vaccines.map((v) => (
+          <div key={v.id} className="p-4 bg-white shadow rounded-xl space-y-1">
+            <p><strong>Vaccine:</strong> {v.name}</p>
+            <p><strong>Type:</strong> {v.type}</p>
+            <p><strong>Date Taken:</strong> {v.date}</p>
+            <p><strong>Next Dose:</strong> {v.nextDose || "N/A"}</p>
+            <p><strong>Notes:</strong> {v.notes || "N/A"}</p>
+            {v.certificateUrl && (
+              <a
+                href={v.certificateUrl}
+                className="text-blue-600 underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View Certificate
+              </a>
+            )}
+          </div>
+        ))}
       </div>
+
+      {/* 🧠 Prevention Tips */}
+      <div className="mt-10 bg-yellow-50 p-4 rounded-xl">
+        <h2 className="text-xl font-semibold mb-2">🩺 Post-Vaccine Prevention Tips</h2>
+        <ul className="list-disc ml-6 space-y-1 text-gray-700">
+          <li>Avoid heavy physical activity for 24 hours.</li>
+          <li>Stay hydrated and eat light meals.</li>
+          <li>Monitor for allergic reactions or swelling.</li>
+          <li>Rest if feeling feverish or dizzy.</li>
+        </ul>
+      </div>
+      {/* 💬 AI Chatbot for Vaccine Guidance */}
+<div className="mt-10">
+  <VaccineChatbot vaccines={vaccines} />
+</div>
     </div>
   );
 }
